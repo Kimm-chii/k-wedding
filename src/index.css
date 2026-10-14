@@ -6,8 +6,16 @@
 }
 
 @layer base {
+  [hidden] {
+    display: none !important;
+  }
+
   html {
     scroll-behavior: smooth;
+    /* no double-tap zoom, no rubber-band bounce in in-app browsers, no sideways wiggle */
+    touch-action: manipulation;
+    overscroll-behavior: none;
+    overflow-x: clip;
   }
   
   body {
@@ -19,3 +27,9 @@
   }
 }
 
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}

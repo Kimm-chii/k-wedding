@@ -7,7 +7,7 @@ import { Footer } from './components/Footer';
 
 export default function App() {
   return (
-    <div className="min-h-screen bg-stone-50 selection:bg-stone-200 selection:text-stone-900">
+    <div className="min-h-[calc(var(--sh,1vh)*100)] bg-stone-50 selection:bg-stone-200 selection:text-stone-900">
       <IntroAnimation />
       <Navigation />
       <Hero />

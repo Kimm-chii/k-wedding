@@ -4,7 +4,7 @@ import { Image } from './Image';
 
 export function Hero() {
   return (
-    <section className="relative h-[100svh] w-full flex items-center justify-center overflow-hidden bg-stone-900">
+    <section className="relative h-[calc(var(--sh,1vh)*100)] w-full flex items-center justify-center overflow-hidden bg-stone-900">
       <div className="absolute inset-0 w-full h-full">
         <Image 
           src={siteConfig.images.hero} 

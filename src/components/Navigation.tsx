@@ -1,10 +1,19 @@
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 import { siteConfig } from '../config';
 
 export function Navigation() {
   const [scrolled, setScrolled] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const still = useReducedMotion();
+
+  // Escape closes the phone menu
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setIsOpen(false); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [isOpen]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -49,13 +58,15 @@ export function Navigation() {
           </div>
 
           <button 
-            className="md:hidden flex flex-col justify-center items-center w-10 h-10 z-50 rounded-full bg-stone-900/10 backdrop-blur-sm"
+            className={`md:hidden relative flex justify-center items-center w-10 h-10 z-50 rounded-full bg-stone-900/10 backdrop-blur-sm transition-colors duration-300 ${scrolled || isOpen ? 'text-stone-900' : 'text-white'}`}
             onClick={() => setIsOpen(!isOpen)}
-            aria-label="Toggle menu"
+            aria-label={isOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={isOpen}
           >
-            <span className={`block w-5 h-[1.5px] bg-current transition-all duration-300 ${isOpen ? 'rotate-45 translate-y-1.5' : '-translate-y-1'} ${scrolled || isOpen ? 'text-stone-900' : 'text-white'}`} />
-            <span className={`block w-5 h-[1.5px] bg-current transition-all duration-300 ${isOpen ? 'opacity-0' : 'opacity-100'} ${scrolled || isOpen ? 'text-stone-900' : 'text-white'}`} />
-            <span className={`block w-5 h-[1.5px] bg-current transition-all duration-300 ${isOpen ? '-rotate-45 -translate-y-1.5' : 'translate-y-1'} ${scrolled || isOpen ? 'text-stone-900' : 'text-white'}`} />
+            {/* three centered bars that turn into an X */}
+            <span className={`absolute w-5 h-[1.5px] bg-current transition-transform duration-300 ease-out motion-reduce:transition-none ${isOpen ? 'rotate-45' : '-translate-y-[5px]'}`} />
+            <span className={`absolute w-5 h-[1.5px] bg-current transition-opacity duration-200 motion-reduce:transition-none ${isOpen ? 'opacity-0' : 'opacity-100'}`} />
+            <span className={`absolute w-5 h-[1.5px] bg-current transition-transform duration-300 ease-out motion-reduce:transition-none ${isOpen ? '-rotate-45' : 'translate-y-[5px]'}`} />
           </button>
         </div>
       </motion.nav>
@@ -65,8 +76,8 @@ export function Navigation() {
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20, transition: { duration: 0.3 } }}
-            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+            exit={{ opacity: 0, y: -20, transition: { duration: still ? 0 : 0.3 } }}
+            transition={{ duration: still ? 0 : 0.5, ease: [0.22, 1, 0.36, 1] }}
             className="fixed inset-0 bg-stone-50 z-40 flex flex-col justify-center items-center"
           >
             <div className="flex flex-col items-center gap-10">
@@ -77,7 +88,7 @@ export function Navigation() {
                   onClick={() => setIsOpen(false)}
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.1, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                  transition={still ? { duration: 0 } : { delay: i * 0.1, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
                   className="text-stone-900 font-serif text-4xl hover:text-stone-500 transition-colors"
                 >
                   {link.name}
@@ -88,7 +99,7 @@ export function Navigation() {
             <motion.div 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.8 }}
+              transition={still ? { duration: 0 } : { delay: 0.8 }}
               className="absolute bottom-12 uppercase tracking-widest text-xs text-stone-400"
             >
               {siteConfig.date.full}
